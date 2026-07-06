@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, jsonify
 
 # CRITICAL VERCEL ROUTING: Define the global worker hook variable name explicitly
 app = Flask(__name__)
-DB_FILE = "/tmp/database.db"
+DB_FILE = "database.db"
 
 BASE_ROSTER = [
   {"id":"FAC1","name":"Mr. Mujtaba Khan","grade":"Faculty & Staff","section":"Managing Director"},
