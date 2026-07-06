@@ -139,25 +139,26 @@ BASE_ROSTER = [
   {"id":"97","name":"Zunairah Amtul Aleem","grade":"8","section":""}
 ]
 
-def init_db():
+def get_db_connection():
+    """Safe on-demand connection factory that initializes files within active request cycles only."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS votes (position TEXT, candidate_id TEXT, ballot_type TEXT)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS voter_history (voter_id TEXT, ballot_type TEXT, count INTEGER)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS server_config (config_key TEXT PRIMARY KEY, config_val TEXT)''')
     conn.commit()
-    conn.close()
-
-# Force standard SQLite tables initialization routine 
-init_db()
+    return conn
 
 @app.route('/')
 def home():
+    # Trigger database check inside active route lifecycle to comply with Vercel's read-only builder context
+    conn = get_db_connection()
+    conn.close()
     return render_template('index.html')
 
 @app.route('/api/get-initial-state')
 def get_initial_state():
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute("SELECT config_val FROM server_config WHERE config_key='ballot_structure'")
@@ -194,7 +195,7 @@ def get_initial_state():
 @app.route('/api/save-config', methods=['POST'])
 def save_config():
     data = request.json
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT OR REPLACE INTO server_config (config_key, config_val) VALUES ('ballot_structure', ?)", (json.dumps(data),))
     conn.commit()
@@ -204,7 +205,7 @@ def save_config():
 @app.route('/api/save-rosters', methods=['POST'])
 def save_rosters():
     data = request.json
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     cursor = conn.cursor()
     if "general" in data:
         cursor.execute("INSERT OR REPLACE INTO server_config (config_key, config_val) VALUES ('general_roster', ?)", (json.dumps(data["general"]),))
@@ -224,7 +225,7 @@ def cast_vote():
     is_staff = str(voter_id).startswith("FAC")
     max_allowed = 2 if is_staff else 1
 
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT count FROM voter_history WHERE voter_id=? AND ballot_type=?", (voter_id, ballot_type))
@@ -249,16 +250,10 @@ def cast_vote():
 
 @app.route('/api/reset', methods=['POST'])
 def reset_database():
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DROP TABLE IF EXISTS votes")
     cursor.execute("DROP TABLE IF EXISTS voter_history")
     conn.commit()
     conn.close()
-    init_db()
     return jsonify({"success": True})
-
-# FIX: Brought the production worker out of block alignment to compile correctly
-if __name__ == '__main__':
-    init_db()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
