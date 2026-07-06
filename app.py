@@ -3,6 +3,7 @@ import json
 import sqlite3
 from flask import Flask, render_template, request, jsonify
 
+# CRITICAL VERCEL ROUTING: Define the global worker hook variable name explicitly
 app = Flask(__name__)
 DB_FILE = "/tmp/database.db"
 
@@ -15,7 +16,7 @@ BASE_ROSTER = [
   {"id":"FAC6","name":"Ms. Doris Shaik","grade":"Faculty & Staff","section":"Admin Incharge"},
   {"id":"FAC7","name":"Ms. Mahjabeen","grade":"Faculty & Staff","section":"Floor In Charge"},
   {"id":"FAC8","name":"Ms. Seema Jabbar","grade":"Faculty & Staff","section":"In Charge"},
-  {"id(--":"FAC26","name":"Mr. Salman","grade":"Faculty & Staff","section":"Admin"},
+  {"id":"FAC26","name":"Mr. Salman","grade":"Faculty & Staff","section":"Admin"},
   {"id":"FAC9","name":"Ms. Shazia","grade":"Faculty & Staff","section":"Teacher"},
   {"id":"FAC10","name":"Ms. Parveen","grade":"Faculty & Staff","section":"Teacher"},
   {"id":"FAC11","name":"Ms. Rubeena","grade":"Faculty & Staff","section":"Teacher"},
@@ -148,6 +149,9 @@ def init_db():
     conn.commit()
     conn.close()
 
+# CRITICAL CHANGE: Force table initialization instantly on runtime call to dodge serverless import skips
+init_db()
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -255,6 +259,4 @@ def reset_database():
     init_db()
     return jsonify({"success": True})
 
-if __name__ == '__main__':
-    init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# Leave app.run out of scope entirely for clean serverless binding
