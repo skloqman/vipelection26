@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP's Student Council Elections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F4F8;
+    --card:#FFFFFF;
+    --ink:#0F0F14;
+    --ink-light:#5A5A75;
+    --heading:#931111;
+    --heading-dark:#6E0C0C;
+    --gold:#000000;
+    --line:#E2E2EC;
+    --accent:#EAEAFA;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .wrap{max-width:800px; width:100%; margin:0 auto; padding:40px 20px 100px;}
+  header.masthead{text-align:center; padding-bottom:28px; margin-bottom:32px; border-bottom:1px solid var(--line);}
+  .school-logo-container { display: flex; justify-content: center; margin-bottom: 16px; }
+  .school-logo-img{max-height:100px; width:auto; display:block; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.06));}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:4px; text-transform:uppercase; color:var(--heading); font-weight:600; margin-bottom:8px;}
+  h1.title{font-family:'Fraunces',serif; font-weight:700; font-size:clamp(30px,5vw,44px); margin-bottom:6px; color:var(--heading); letter-spacing:-0.5px;}
+  .subtitle{font-weight:500; font-size:14px; color:var(--ink-light);}
+  
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 4px 24px rgba(15,15,20,0.03); padding:32px; margin-bottom:24px;}
+  label.field-label{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-light); margin-bottom:8px;}
+  select, input[type=text], input[type=password], textarea{
+    width:100%; padding:14px 16px; font-family:'Inter',sans-serif; font-size:15px; font-weight:500;
+    border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); outline:none; transition:all 0.2s ease;
+  }
+  select:focus, input[type=text]:focus, input[type=password]:focus, textarea:focus{border-color:var(--heading); box-shadow:0 0 0 4px rgba(147,17,17,0.06);}
+  textarea{font-family:'IBM Plex Mono',monospace; font-size:13px; min-height:120px;}
+
+  .tabs{display:flex; gap:8px; justify-content:center; margin-bottom:28px; background:var(--accent); padding:6px; border-radius:40px;}
+  .tab{font-size:13px; font-weight:600; padding:10px 22px; border:none; border-radius:30px; cursor:pointer; background:transparent; color:var(--ink-light); transition:all 0.2s ease;}
+  .tab.active{background:var(--card); color:var(--heading); box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+  
+  .position-block{margin-bottom:32px;}
+  .position-title{font-family:'Fraunces',serif; font-weight:700; font-size:21px; margin-bottom:14px; color:var(--heading); display:flex; align-items:baseline; gap:8px;}
+  .position-title .count{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-light); font-weight:400; text-transform:uppercase;}
+  
+  .candidate-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:600px){ .candidate-grid{grid-template-columns:1fr;} }
+  
+  .candidate-row{display:flex; align-items:center; gap:16px; padding:18px; border:1.5px solid var(--line); border-radius:12px; cursor:pointer; background:var(--card); transition:all 0.2s ease;}
+  .candidate-row:hover{border-color:var(--heading); background:rgba(147,17,17,0.01); transform:translateY(-1px);}
+  .candidate-row.selected {border-color:var(--heading); background:rgba(147,17,17,0.03); box-shadow:0 0 0 4px rgba(147,17,17,0.06);}
+  
+  .bubble{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); flex-shrink:0; position:relative; transition:all 0.2s ease;}
+  .candidate-row.selected .bubble{border-color:var(--heading); background:var(--heading);}
+  .candidate-row.selected .bubble::after{content:""; position:absolute; inset:5px; border-radius:50%; background:#fff;}
+  
+  .cand-media{position:relative; width:60px; height:56px; flex-shrink:0;}
+  .avatar-img{width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid var(--line); background:#fff;}
+  .avatar-fallback{width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--accent); color:var(--heading); font-family:'Fraunces',serif; font-weight:700; font-size:18px; border:2px solid var(--line);}
+  .logo-badge{position:absolute; right:2px; bottom:-2px; width:24px; height:24px; border-radius:6px; background:#fff; border:1.5px solid var(--line); object-fit:cover;}
+  
+  .cand-name{font-weight:700; font-size:15px; color:var(--ink);}
+  .cand-slogan{font-size:13px; color:var(--ink-light); margin-top:2px; font-style:italic;}
+  
+  .btn{font-size:14px; font-weight:600; padding:14px 28px; border-radius:30px; border:none; background:var(--heading); color:#fff; cursor:pointer; transition:all 0.2s ease; box-shadow:0 4px 12px rgba(147,17,17,0.15);}
+  .btn:hover{background:var(--heading-dark); transform:translateY(-1px); box-shadow:0 6px 18px rgba(147,17,17,0.25);}
+  .btn.small-btn{padding:10px 18px; border-radius:8px; font-size:12px; box-shadow:none;}
+  .btn.danger{background:#DC2626; color:#fff;}
+  .btn.danger:hover{background:#B91C1C;}
+  
+  .bar-row{margin-bottom:16px;}
+  .bar-label{display:flex; justify-content:space-between; align-items:center; font-size:14px; margin-bottom:4px;}
+  .bar-name{font-weight:600;}
+  .bar-track{height:10px; background:var(--accent); border-radius:5px; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--ink-light); border-radius:5px; transition:width 0.6s ease; width:0;}
+  .bar-fill.leader{background:var(--heading);}
+  
+  .msg-banner{font-size:14px; font-weight:500; padding:14px 18px; border-radius:8px; margin-bottom:20px; font-family:'IBM Plex Mono',monospace;}
+  .msg-banner.error{background:#FDF2F2; color:#9B1C1C; border:1px solid #F8B4B4;}
+  .stamp{font-family:'IBM Plex Mono',monospace; font-weight:700; color:var(--heading); border:4px solid var(--heading); padding:10px 20px; font-size:22px; text-transform:uppercase; display:inline-block; transform:rotate(-4deg); margin-bottom:16px; border-radius:4px; animation: stampIn 0.3s ease-out forwards;}
+  @keyframes stampIn { 0% { transform: scale(1.6) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(-4deg); opacity: 1; } }
+  footer.foot{text-align:center; margin-top:auto; padding:36px 0; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-light); border-top:1px solid var(--line);}
+  .sub-card-title { font-family: 'Fraunces', serif; font-size: 19px; margin-bottom: 16px; color: var(--heading); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading-line">Unsealing the ballot box…</div>
+</div>
+
+<script>
+const DEFAULT_PASSCODE = "admin2026";
+const DEFAULT_CONFIG = { 
+  schoolName: "VIP's INTERNATIONAL SCHOOL", 
+  electionTitle: "Student Council Elections, FLK Branch", 
+  year: "2026", 
+  passcode: DEFAULT_PASSCODE,
+  schoolLogo: "https://i.imgur.com/83uD1E8.png", 
+  positions: [
+    { id: "headboy", title: "Head Boy", candidates: [{ id: "hb-a", name: "Khaja Ahsan Uddin (G8)", slogan: "Leadership & Integrity" }, { id: "hb-b", name: "Yahiya Zain (G8)", slogan: "Progress Together" }] },
+    { id: "headgirl", title: "Head Girl", candidates: [{ id: "hg-a", name: "Zunairah Begum (G8)", slogan: "Empowering Voices" }, { id: "hg-b", name: "Zunairah Amtul Aleem (G8)", slogan: "Unity & Excellence" }] },
+    { id: "deptprefectboy", title: "Dept. Prefect Boy", candidates: [{ id: "dpb-a", name: "Ahmed Bakooban (G8)", slogan: "Dedication & Order" }, { id: "dpb-b", name: "Arhum Uddin (G8)", slogan: "Commitment to Change" }] },
+    { id: "deptprefectgirl", title: "Dept. Prefect Girl", candidates: [{ id: "dpg-a", name: "Ammara Faiz (G8)", slogan: "Striving for Perfection" }, { id: "dpg-b", name: "Sidra Fatima (G7)", slogan: "Service & Honor" }] },
+    { id: "sportscaptain", title: "Sports Captain", candidates: [{ id: "sc-a", name: "Ahmad Ali (G6)", slogan: "Teamwork & Victory" }, { id: "sc-b", name: "Aziz (G7)", slogan: "Strength & Sportsmanship" }] },
+    { id: "sportsvicecaptain", title: "Sports Vice Captain", candidates: [{ id: "svc-a", name: "Juveriya Fatima (G7)", slogan: "Resilience & Grit" }, { id: "svc-b", name: "Madiha Bakooban (G6)", slogan: "Play Fair, Lead Well" }] },
+    { id: "ecogroupcaptain", title: "Eco Group Captain", candidates: [{ id: "egc-a", name: "Zara Saleem (G6)", slogan: "Green Mind, Pure Earth" }, { id: "egc-b", name: "Samaira Noor (G5)", slogan: "Sustainability First" }] },
+    { id: "ecogroupvicecaptain", title: "Eco Group Vice Captain", candidates: [{ id: "egvc-a", name: "Abdul Rahman (G6)", slogan: "Protect & Preserve" }, { id: "egvc-b", name: "Rayyan (G6)", slogan: "Small Actions, Big Impact" }] },
+    { id: "apple_captain", title: "Apple Group Captain", candidates: [{ id: "ac-a", name: "Arhaan Uddin (G8)", slogan: "Lead by Example" }, { id: "ac-b", name: "Abdul Kabeer (G6)", slogan: "Strength in Unity" }] },
+    { id: "apple_vicecaptain", title: "Apple Group Vice Captain", candidates: [{ id: "avc-a", name: "Maryam Fatima (G5)", slogan: "Determination Wins" }, { id: "avc-b", name: "Ummul Hamda (G7)", slogan: "Bright Futures Ahead" }] },
+    { id: "challengers_captain", title: "Challengers House Captain", candidates: [{ id: "cc-a", name: "Taha Syed Najeeb (G7)", slogan: "Fearless & Bold" }, { id: "cc-b", name: "Muhammed (G5)", slogan: "Rise to the Challenge" }] },
+    { id: "challengers_vicecaptain", title: "Challengers House Vice Captain", candidates: [{ id: "cvc-a", name: "Syed Uzair (G6)", slogan: "Loyal & Focused" }, { id: "cvc-b", name: "Furqan (G7)", slogan: "Persist and Prevail" }] },
+    { id: "champions_captain", title: "Champions House Captain", candidates: [{ id: "chc-a", name: "Tameem Rahil Bhat (G6)", slogan: "Born to Win" }, { id: "chc-b", name: "Abdullah Syed Hassan (G8)", slogan: "Excellence Everyday" }] },
+    { id: "champions_vicecaptain", title: "Champions House Vice Captain", candidates: [{ id: "chvc-a", name: "Saddiq Qureshi (G7)", slogan: "Integrity & Power" }, { id: "chvc-b", name: "Zain Mahmood (G5)", slogan: "True Champions Strive" }] },
+    { id: "superiors_captain", title: "Superiors House Captain", candidates: [{ id: "suc-a", name: "Rabah Ur Rahman (G7)", slogan: "Aim Higher" }, { id: "suc-b", name: "Sanaullah (G7)", slogan: "Excellence and Beyond" }] },
+    { id: "superiors_vicecaptain", title: "Superiors House Vice Captain", candidates: [{ id: "suvc-a", name: "Arbiya Fatima (G7)", slogan: "Strive Natively" }, { id: "suvc-b", name: "Afeefah Fatima (G6)", slogan: "Honor & Grace" }] },
+    { id: "warriors_captain", title: "Warriors House Captain", candidates: [{ id: "wc-a", name: "Munnaza Zareen (G7)", slogan: "Victory is Ours" }, { id: "wc-b", name: "Zunairah Hyder (G5)", slogan: "Fight with Courage" }] },
+    { id: "warriors_vicecaptain", title: "Warriors House Vice Captain", candidates: [{ id: "wvc-a", name: "Durar Hadi (G5)", slogan: "Never Give Up" }, { id: "wvc-b", name: "Syeda Mahreen (G7)", slogan: "Unstoppable Strength" }] }
+  ]
+};
+
+let state = {
+  view: "vote",
+  config: null,
+  votes: {},
+  voters: {}, 
+  roster: [],
+  specialRoster: [],
+  houseVoters: {}, 
+  selectedGrade: "",
+  selectedStudentId: "",
+  selectedHouseGrade: "",
+  selectedHouseStudentId: "",
+  selections: {},
+  houseSelections: {},
+  error: "",
+  adminError: "",
+  isAdmin: false,
+  lastReceipt: null,
+  lastVoteView: "vote"
+};
+
+function getStaffOrderScore(section) {
+  const s = (section || "").toLowerCase();
+  if (s.includes("managing director")) return 1;
+  if (s.includes("academic director")) return 2;
+  if (s.includes("academic coordinator")) return 3;
+  if (s.includes("academic incharge")) return 4;
+  if (s.includes("hod")) return 5;
+  if (s.includes("admin")) return 6;
+  if (s.includes("teacher")) return 7;
+  if (s.includes("driver")) return 8;
+  return 9; 
+}
+
+async function syncFromServer() {
+  try {
+    const res = await fetch('/api/get-initial-state');
+    const data = await res.json();
+    state.roster = data.roster;
+    state.specialRoster = data.specialRoster;
+    state.votes = data.votes;
+    state.voters = data.voters;
+    state.houseVoters = data.houseVoters;
+    state.config = data.structure ? data.structure : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  } catch(e) { console.error("API link failed:", e); }
+}
+
+function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+function normId(id){ return (id || "").trim().toLowerCase(); }
+function initials(name){ return (name||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase(); }
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+function avatarHtml(name, photo){
+  if (photo) return '<img class="avatar-img" src="' + photo + '" alt="">';
+  return '<div class="avatar-fallback">' + esc(initials(name)) + '</div>';
+}
+
+function render(){
+  const app = document.getElementById("app");
+  if (!state.config) return;
+  const cfg = state.config;
+  
+  let html = '<header class="masthead"><div class="school-logo-container">';
+  if(cfg.schoolLogo) html += '<img class="school-logo-img" src="' + cfg.schoolLogo + '" alt="Logo">';
+  html += '</div><div class="eyebrow">Official Ballot &middot; ' + esc(cfg.year) + '</div>';
+  html += '<h1 class="title">' + esc(cfg.schoolName) + '</h1>';
+  html += '<div class="subtitle">' + esc(cfg.electionTitle) + '</div></header>';
+  
+  html += '<div class="tabs">' + tabBtn("vote","Voter Ballot") + tabBtn("house-vote","Special Votes") + tabBtn("admin","Management Center") + '</div>';
+
+  if (state.view === "vote") html += renderVote(cfg);
+  else if (state.view === "house-vote") html += renderHouseVote(cfg);
+  else if (state.view === "voted") html += renderVoted(cfg);
+  else if (state.view === "admin-login") html += renderAdminLogin();
+  else if (state.view === "admin") html += renderAdmin(cfg);
+
+  app.innerHTML = html;
+  attachHandlers();
+}
+
+function tabBtn(view, label){
+  const active = state.view === view || (view==="vote" && state.view==="voted") || (view==="admin" && state.view==="admin-login");
+  return '<button class="tab ' + (active ? "active":"") + '" data-tab="' + view + '">' + label + '</button>';
+}
+
+function renderVote(cfg){
+  let html = '<div class="card"><div class="card-inner">';
+  if (state.error) html += '<div class="msg-banner error">' + esc(state.error) + '</div>';
+  const categories = Array.from(new Set(state.roster.map(s => String(s.grade)))).sort();
+
+  html += '<label class="field-label">Choose Category / Grade</label><select id="voteGradeSelect"><option value="">Select option...</option>';
+  categories.forEach(g => { html += '<option value="' + esc(g) + '" ' + (state.selectedGrade===g?"selected":"") + '>' + (g==="Faculty & Staff"?g:"Grade "+g) + '</option>'; });
+  html += '</select><div style="height:16px;"></div>';
+
+  html += '<label class="field-label">Select Your Profile Name</label><select id="voteNameSelect" ' + (state.selectedGrade?"":"disabled") + '>';
+  html += '<option value="">Choose name...</option>';
+  if(state.selectedGrade){
+    state.roster.filter(s => String(s.grade)===state.selectedGrade).forEach(s => {
+      let voted = (state.voters[normId(s.id)] || 0) >= (s.grade==="Faculty & Staff"?2:1);
+      html += '<option value="' + esc(s.id) + '" ' + (voted?'disabled':'') + ' ' + (state.selectedStudentId===s.id?"selected":"") + '>' + esc(s.name) + (s.section?' ('+esc(s.section)+')':'') + (voted?' (Already Voted)':'') + '</option>';
+    });
+  }
+  html += '</select></div></div>';
+
+  html += '<form id="ballotForm">';
+  cfg.positions.filter(p => !p.id.includes("captain") && !p.id.includes("vicecaptain") && !p.id.includes("group")).forEach(pos => {
+    html += '<div class="position-block"><div class="position-title">' + esc(pos.title) + ' <span class="count">Select One</span></div><div class="candidate-grid">';
+    pos.candidates.forEach(c => {
+      const isSel = state.selections[pos.id] === c.id;
+      html += '<div class="candidate-row ' + (isSel?"selected":"") + '" data-pos="' + pos.id + '" data-cand="' + c.id + '"><div class="bubble"></div>';
+      html += '<div class="cand-media">' + avatarHtml(c.name, c.photo) + (c.logo?'<img class="logo-badge" src="'+c.logo+'">':'') + '</div>';
+      html += '<div><div class="cand-name">' + esc(c.name) + '</div>' + (c.slogan?'<div class="cand-slogan">'+esc(c.slogan)+'</div>':'') + '</div></div>';
+    });
+    html += '</div></div>';
+  });
+  html += '<div style="text-align:center;"><button type="submit" class="btn">Cast Official Ballot</button></div></form>';
+  return html;
+}
+
+function renderHouseVote(cfg){
+  let html = '<div class="card"><div class="card-inner">';
+  if (state.error) html += '<div class="msg-banner error">' + esc(state.error) + '</div>';
+  const categories = Array.from(new Set(state.specialRoster.map(s => String(s.grade)))).sort();
+
+  html += '<label class="field-label">Special Clearances Menu</label><select id="houseGradeSelect"><option value="">Select option...</option>';
+  categories.forEach(g => { html += '<option value="' + esc(g) + '" ' + (state.selectedHouseGrade===g?"selected":"") + '>' + (g==="Faculty & Staff"?g:"Grade "+g) + '</option>'; });
+  html += '</select><div style="height:16px;"></div>';
+
+  html += '<label class="field-label">Select Special Voter Profile</label><select id="houseNameSelect" ' + (state.selectedHouseGrade?"":"disabled") + '>';
+  html += '<option value="">Choose name...</option>';
+  if(state.selectedHouseGrade){
+    state.specialRoster.filter(s => String(s.grade)===state.selectedHouseGrade).forEach(s => {
+      let voted = (state.houseVoters[normId(s.id)] || 0) >= (s.grade==="Faculty & Staff"?2:1);
+      html += '<option value="' + esc(s.id) + '" ' + (voted?'disabled':'') + ' ' + (state.selectedHouseStudentId===s.id?"selected":"") + '>' + esc(s.name) + (s.section?' ('+esc(s.section)+')':'') + (voted?' (Ballot Complete)':'') + '</option>';
+    });
+  }
+  html += '</select></div></div>';
+
+  html += '<form id="houseBallotForm">';
+  cfg.positions.filter(p => p.id.includes("captain") || p.id.includes("vicecaptain") || p.id.includes("group")).forEach(pos => {
+    html += '<div class="position-block"><div class="position-title">' + esc(pos.title) + ' <span class="count">Select One</span></div><div class="candidate-grid">';
+    pos.candidates.forEach(c => {
+      const isSel = state.houseSelections[pos.id] === c.id;
+      html += '<div class="candidate-row ' + (isSel?"selected":"") + '" data-hpos="' + pos.id + '" data-hcand="' + c.id + '"><div class="bubble"></div>';
+      html += '<div class="cand-media">' + avatarHtml(c.name, c.photo) + (c.logo?'<img class="logo-badge" src="'+c.logo+'">':'') + '</div>';
+      html += '<div><div class="cand-name">' + esc(c.name) + '</div>' + (c.slogan?'<div class="cand-slogan">'+esc(c.slogan)+'</div>':'') + '</div></div>';
+    });
+    html += '</div></div>';
+  });
+  html += '<div style="text-align:center;"><button type="submit" class="btn">Cast Special Ballot</button></div></form>';
+  return html;
+}
+
+function renderVoted(cfg){
+  const r = state.lastReceipt;
+  return '<div class="card" style="text-align:center;"><div class="stamp">Ballot Logged</div>' +
+         '<div class="receipt">Voter: ' + esc(r.name) + '<br>Remaining Allocations: ' + r.votesRemaining + '</div>' +
+         '<div style="margin-top:24px;"><button class="btn" onclick="state.view=\''+state.lastVoteView+'\';render();">Return to Dropdowns</button></div></div>';
+}
+
+function renderAdminLogin(){
+  return '<div class="card"><label class="field-label">Passcode Validation Key</label>' +
+         (state.adminError?'<div class="msg-banner error">'+esc(state.adminError)+'</div>':'') +
+         '<div class="row-flex"><input type="password" id="adminPassInput" placeholder="••••••••">' +
+         '<button class="btn small-btn" id="loginEnterBtn" style="margin-left:12px;">Validate</button></div></div>';
+}
+
+function renderAdmin(cfg){
+  let html = '<div class="card"><h2 class="sub-card-title">Live Metrics Tally</h2>';
+  cfg.positions.forEach(pos => {
+    html += '<div style="margin-bottom:16px;"><div class="position-title" style="font-size:15px;">' + esc(pos.title) + '</div>';
+    pos.candidates.forEach(c => {
+      let count = state.votes[c.id] || 0;
+      html += '<div class="bar-row"><div class="bar-label"><span>' + esc(c.name) + '</span><strong>' + count + ' votes</strong></div>' +
+              '<div class="bar-track"><div class="bar-fill leader" style="width:' + (count*12) + '%;"></div></div></div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="card"><h2 class="sub-card-title">School Asset Configuration</h2>' +
+          '<label class="field-label">School Header Logo Image</label><input type="file" id="logoUploadInput"><br><br>' +
+          '<button class="btn small-btn" id="saveAssetBtn">Update Server Assets</button></div>';
+
+  html += '<div class="card"><h2 class="sub-card-title">Candidate Profile & Media Vault (Admin Only)</h2>';
+  cfg.positions.forEach(pos => {
+    html += '<div style="margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line);"><strong>' + esc(pos.title) + '</strong>';
+    pos.candidates.forEach(c => {
+      html += '<div style="margin:10px 0; display:flex; align-items:center; justify-content:space-between; gap:16px;">' +
+              '<span>' + esc(c.name) + '</span><div style="display:flex; gap:8px;">' +
+              '<label class="small-btn" style="background:var(--accent);padding:6px;cursor:pointer;">Photo <input type="file" data-pimg="' + pos.id + '|' + c.id + '" style="display:none;"></label>' +
+              '<label class="small-btn" style="background:var(--accent);padding:6px;cursor:pointer;">Logo <input type="file" data-limg="' + pos.id + '|' + c.id + '" style="display:none;"></label>' +
+              '</div></div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="card"><h2 class="sub-card-title">Voter Roster Upload Portals (Append/Edit Mode)</h2>' +
+          '<p class="subtitle" style="margin-bottom:12px;">Paste raw rows below to add newly declared profiles anytime. Format: ID, Full Name, Grade, Section</p>' +
+          '<label class="field-label">General Roster Entries</label>' +
+          '<textarea id="gRosterRaw" placeholder="101, Student Name, 4, \nFAC50, New Staff Name, Faculty & Staff, Teacher"></textarea><br><br>' +
+          '<label class="field-label">Special Vote Roster Entries (Selected Student Category)</label> template' +
+          '<textarea id="sRosterRaw" placeholder="62, Abdullah Syed Hasan, 7, \n80, Abdullah Syed Hasan, 8, "></textarea><br><br>' +
+          '<button class="btn small-btn" id="saveRostersBtn">Compile & Append Profiles</button></div>';
+
+  html += '<div class="card"><button class="btn danger small-btn" id="dbResetBtn">Wipe Votes Ledger Only</button></div>';
+  return html;
+}
+
+function attachHandlers(){
+  document.querySelectorAll('[data-tab]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tab = el.getAttribute('data-tab'); state.error = "";
+      if (tab === "admin") state.view = state.isAdmin ? "admin" : "admin-login";
+      else state.view = tab;
+      render();
+    });
+  });
+
+  const vGrade = document.getElementById('voteGradeSelect');
+  if(vGrade) vGrade.addEventListener('change', (e) => { state.selectedGrade = e.target.value; state.selectedStudentId=""; render(); });
+  const vName = document.getElementById('voteNameSelect');
+  if(vName) vName.addEventListener('change', (e) => { state.selectedStudentId = e.target.value; });
+
+  const hGrade = document.getElementById('houseGradeSelect');
+  if(hGrade) hGrade.addEventListener('change', (e) => { state.selectedHouseGrade = e.target.value; state.selectedHouseStudentId=""; render(); });
+  const hName = document.getElementById('houseNameSelect');
+  if(hName) hName.addEventListener('change', (e) => { state.selectedHouseStudentId = e.target.value; });
+
+  document.querySelectorAll('.candidate-row[data-pos]').forEach(r => {
+    r.addEventListener('click', () => { state.selections[r.getAttribute('data-pos')] = r.getAttribute('data-cand'); render(); });
+  });
+  document.querySelectorAll('.candidate-row[data-hpos]').forEach(r => {
+    r.addEventListener('click', () => { state.houseSelections[r.getAttribute('data-hpos')] = r.getAttribute('data-hcand'); render(); });
+  });
+
+  const bForm = document.getElementById('ballotForm');
+  if(bForm) bForm.addEventListener('submit', async (e) => { e.preventDefault(); await processVote('general', state.selectedStudentId, state.selections); });
+  const hForm = document.getElementById('houseBallotForm');
+  if(hForm) hForm.addEventListener('submit', async (e) => { e.preventDefault(); await processVote('special', state.selectedHouseStudentId, state.houseSelections); });
+
+  const loginBtn = document.getElementById('loginEnterBtn');
+  if(loginBtn) loginBtn.addEventListener('click', () => {
+    if(document.getElementById('adminPassInput').value === state.config.passcode){ state.isAdmin=true; state.view="admin"; }
+    else state.adminError="Invalid passcode verification key.";
+    render();
+  });
+
+  const saveAssetBtn = document.getElementById('saveAssetBtn');
+  if(saveAssetBtn) saveAssetBtn.addEventListener('click', async () => {
+    const fileEl = document.getElementById('logoUploadInput');
+    if(fileEl.files.length > 0) {
+      state.config.schoolLogo = await toBase64(fileEl.files[0]);
+      await fetch('/api/save-config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state.config) });
+      alert("School header icon uploaded successfully.");
+    }
+    render();
+  });
+
+  document.querySelectorAll('input[data-pimg]').forEach(inp => {
+    inp.addEventListener('change', async (e) => {
+      const [posId, candId] = inp.getAttribute('data-pimg').split('|');
+      const pos = state.config.positions.find(p => p.id === posId);
+      const cand = pos.candidates.find(c => c.id === candId);
+      cand.photo = await toBase64(e.target.files[0]);
+      await fetch('/api/save-config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state.config) });
+      alert("Candidate picture mapped successfully.");
+    });
+  });
+
+  document.querySelectorAll('input[data-limg]').forEach(inp => {
+    inp.addEventListener('change', async (e) => {
+      const [posId, candId] = inp.getAttribute('data-limg').split('|');
+      const pos = state.config.positions.find(p => p.id === posId);
+      const cand = pos.candidates.find(c => c.id === candId);
+      cand.logo = await toBase64(e.target.files[0]);
+      await fetch('/api/save-config', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(state.config) });
+      alert("Group emblem mapped successfully.");
+    });
+  });
+
+  const rosterBtn = document.getElementById('saveRostersBtn');
+  if(rosterBtn) rosterBtn.addEventListener('click', async () => {
+    let payload = {};
+    const gRaw = document.getElementById('gRosterRaw').value.trim();
+    const sRaw = document.getElementById('sRosterRaw').value.trim();
+    
+    if(gRaw) payload["general"] = gRaw.split('\n').map(l => { const p=l.split(','); return {"id":p[0].trim(),"name":p[1].trim(),"grade":p[2].trim(),"section":p[3]?p[3].trim():""}; });
+    if(sRaw) payload["special"] = sRaw.split('\n').map(l => { const p=l.split(','); return {"id":p[0].trim(),"name":p[1].trim(),"grade":p[2].trim(),"section":p[3]?p[3].trim():""}; });
+    
+    await fetch('/api/save-rosters', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    alert("New profile indices logged securely to server storage.");
+    await syncFromServer(); render();
+  });
+
+  const resetBtn = document.getElementById('dbResetBtn');
+  if(resetBtn) resetBtn.addEventListener('click', async () => {
+    if(!confirm("Clear vote ledgers?")) return;
+    await fetch('/api/reset', {method:'POST'}); await syncFromServer(); render();
+  });
+}
+
+async function processVote(type, voterId, selectionSet){
+  if(!voterId){ state.error="Voter credentials missing."; render(); return; }
+  const res = await fetch('/api/cast-vote', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ voterId: voterId, ballotType: type, selections: selectionSet })
+  });
+  const reply = await res.json();
+  if(!reply.success){ state.error = reply.error; render(); return; }
+  
+  const pool = type === 'general' ? state.roster : state.specialRoster;
+  const profile = pool.find(s => s.id === voterId);
+  state.lastReceipt = { name: profile.name, grade: profile.grade, time: new Date().toLocaleString(), code: Math.random().toString(36).substring(3,9).toUpperCase(), votesRemaining: reply.votes_remaining };
+  state.lastVoteView = type === 'general' ? 'vote' : 'house-vote';
+  if(type==='general') state.selections={}; else state.houseSelections={};
+  state.selectedGrade=""; state.selectedStudentId=""; state.selectedHouseGrade=""; state.selectedHouseStudentId="";
+  state.view="voted"; await syncFromServer(); render();
+}
+
+(async function init(){ await syncFromServer(); render(); })();
+</script>
+</body>
+</html>
