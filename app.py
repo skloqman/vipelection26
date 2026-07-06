@@ -3,7 +3,6 @@ import json
 import sqlite3
 from flask import Flask, render_template, request, jsonify
 
-# CRITICAL VERCEL ROUTING: Define the global worker hook variable name explicitly
 app = Flask(__name__)
 DB_FILE = "database.db"
 
@@ -149,7 +148,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# CRITICAL CHANGE: Force table initialization instantly on runtime call to dodge serverless import skips
+# Force standard SQLite tables initialization routine 
 init_db()
 
 @app.route('/')
@@ -259,4 +258,7 @@ def reset_database():
     init_db()
     return jsonify({"success": True})
 
-# Leave app.run out of scope entirely for clean serverless binding
+# FIX: Brought the production worker out of block alignment to compile correctly
+if __name__ == '__main__':
+    init_db()
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
