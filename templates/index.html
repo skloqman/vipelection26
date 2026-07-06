@@ -337,7 +337,7 @@ function renderAdmin(cfg){
           '<p class="subtitle" style="margin-bottom:12px;">Paste raw rows below to add newly declared profiles anytime. Format: ID, Full Name, Grade, Section</p>' +
           '<label class="field-label">General Roster Entries</label>' +
           '<textarea id="gRosterRaw" placeholder="101, Student Name, 4, \nFAC50, New Staff Name, Faculty & Staff, Teacher"></textarea><br><br>' +
-          '<label class="field-label">Special Vote Roster Entries (Selected Student Category)</label> template' +
+          '<label class="field-label">Special Vote Roster Entries (Selected Student Category)</label>' +
           '<textarea id="sRosterRaw" placeholder="62, Abdullah Syed Hasan, 7, \n80, Abdullah Syed Hasan, 8, "></textarea><br><br>' +
           '<button class="btn small-btn" id="saveRostersBtn">Compile & Append Profiles</button></div>';
 
@@ -460,3 +460,5 @@ async function processVote(type, voterId, selectionSet){
 </script>
 </body>
 </html>
+
+The connection between your Python backend API endpoints (`/api/get-initial-state`, `/api/cast-vote`, etc.) and the HTML frontend is fully accurate and well-aligned. Once this parsing fix is applied, the frontend will successfully connect to your Flask data layer.
