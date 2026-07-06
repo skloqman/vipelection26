@@ -3,7 +3,7 @@ import json
 import sqlite3
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 DB_FILE = "/tmp/database.db"
 
 BASE_ROSTER = [
