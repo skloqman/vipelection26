@@ -4,7 +4,7 @@ import sqlite3
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
-DB_FILE = "database.db"
+DB_FILE = "/tmp/database.db"
 
 BASE_ROSTER = [
   {"id":"FAC1","name":"Mr. Mujtaba Khan","grade":"Faculty & Staff","section":"Managing Director"},
